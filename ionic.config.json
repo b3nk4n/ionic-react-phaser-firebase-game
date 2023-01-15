@@ -1,0 +1,7 @@
+{
+  "name": "ionic-react-phaser-game-template",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react"
+}
