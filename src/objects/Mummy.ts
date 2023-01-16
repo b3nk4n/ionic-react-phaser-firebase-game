@@ -5,13 +5,18 @@ export default class Mummy {
   private static readonly SPRITESHEET = "mummy"
   private static readonly ANIM_WALK = "walk";
   private static readonly SPEED = 0.025;
+
   private direction = 1;
-
   private scene: Phaser.Scene;
-  private _sprite!: Phaser.GameObjects.Sprite;
+  private name: string;
 
-  constructor(scene: Phaser.Scene) {
+  private _sprite!: Phaser.GameObjects.Sprite;
+  private nameLabel!: Phaser.GameObjects.Text;
+
+
+  constructor(scene: Phaser.Scene, name: string) {
     this.scene = scene;
+    this.name = name;
   }
 
   preload(): void {
@@ -22,23 +27,35 @@ export default class Mummy {
   }
 
   create(x: number, y: number): void {
-    this._sprite = this.scene.add.sprite(x, y, Mummy.SPRITESHEET);
-    this.scene.anims.create({
-      key: Mummy.ANIM_WALK,
-      frames: this.scene.anims.generateFrameNumbers(Mummy.SPRITESHEET, {
-        start: 0,
-        end: 17,
-      }),
-      frameRate: 16,
-      repeat: -1,
-    });
+    this.scene
+      .anims
+      .create({
+        key: Mummy.ANIM_WALK,
+        frames: this.scene.anims.generateFrameNumbers(Mummy.SPRITESHEET, {
+          start: 0,
+          end: 17,
+        }),
+        frameRate: 16,
+        repeat: -1,
+      });
 
-    this.sprite.play(Mummy.ANIM_WALK);
+    this._sprite = this.scene
+      .add
+      .sprite(x, y, Mummy.SPRITESHEET)
+      .play(Mummy.ANIM_WALK);
+
+    this.nameLabel = this.scene
+      .add
+      .text(-100, -100, this.name)
+      .setFontSize(10)
+      .setOrigin(0.5, 0.5);
   }
 
   update(time: number, delta: number): void {
     const newX = this.sprite.x + this.direction * Mummy.SPEED * delta;
     this.sprite.setX(newX);
+
+    this.nameLabel.setPosition(this.sprite.x, this.sprite.y - 28);
   }
 
   turn(): void {

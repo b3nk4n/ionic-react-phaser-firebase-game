@@ -11,9 +11,9 @@ export default class GameScene extends Phaser.Scene {
   private fullscreenButton!: Phaser.GameObjects.Image;
   private backCallback: () => void;
 
-  constructor(backCallback: () => void) {
+  constructor(name: string, backCallback: () => void) {
     super("game1");
-    this.mummy = new Mummy(this);
+    this.mummy = new Mummy(this, name);
     this.backCallback = backCallback;
   }
 

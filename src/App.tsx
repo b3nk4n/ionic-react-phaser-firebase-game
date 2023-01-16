@@ -54,7 +54,7 @@ const App = () => {
             <Route exact path="/lobby">
               {loggedIn ? <Lobby /> : <Redirect to="/login" />}
             </Route>
-            <Route exact path="/game">
+            <Route exact path="/game/:name">
               {loggedIn ? <GamePage /> : <Redirect to="/login" />}
             </Route>
             <Route exact path="/">
