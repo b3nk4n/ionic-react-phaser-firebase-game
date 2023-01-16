@@ -31,7 +31,7 @@ const Login = () => {
       </IonHeader>
       <IonContent className="ion-padding" fullscreen>
         <IonButton className="ion-padding" expand="block" onClick={handleAnonymousSignIn}>
-          {status.loading && <IonSpinner slot="start" name="lines-small" color="primary" />}
+          {status.loading && <IonSpinner slot="start" name="lines-small" />}
           {!status.loading && <IonIcon slot="start" icon={logIn} />}
           Sign In Anonymously
         </IonButton>
