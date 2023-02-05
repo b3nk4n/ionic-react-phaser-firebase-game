@@ -13,7 +13,6 @@ const Lobby = () => {
   };
 
   const gameLink = `/game/${name}`;
-  console.log(gameLink);
   return (
     <IonPage>
       <IonHeader>

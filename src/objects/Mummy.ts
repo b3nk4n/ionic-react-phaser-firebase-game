@@ -6,7 +6,7 @@ export default class Mummy {
 
   private static readonly SPRITESHEET = "mummy"
   private static readonly ANIM_WALK = "walk";
-  private static readonly SPEED = 0.025;
+  public static readonly SPEED = 0.025;
 
   private readonly scene: Phaser.Scene;
   private readonly name: string;
@@ -48,21 +48,19 @@ export default class Mummy {
 
     this.nameLabel = this.scene
       .add
-      .text(-100, -100, this.name)
+      .text(this.sprite.x, this.sprite.y - 28, this.name)
       .setFontSize(10)
       .setOrigin(0.5, 0.5);
   }
 
-  update(time: number, delta: number): void {
-    const newX = this.sprite.x + this.direction * Mummy.SPEED * delta;
-    this.sprite.setX(newX);
-
-    this.nameLabel.setPosition(this.sprite.x, this.sprite.y - 28);
+  setDirection(left: boolean): void {
+    this.direction = left ? -1 : 1;
+    this.sprite.flipX = this.isLeftDirection();
   }
 
-  turn(): void {
-    this.direction *= -1;
-    this.sprite.flipX = this.isLeftDirection();
+  updatePositionX(x: number): void {
+    this.sprite.setX(x);
+    this.nameLabel.setPosition(this.sprite.x, this.sprite.y - 28);
   }
 
   get sprite(): Phaser.GameObjects.Sprite {
@@ -71,5 +69,10 @@ export default class Mummy {
 
   isLeftDirection(): boolean {
     return this.direction !== 1;
+  }
+
+  dispose(): void {
+    this.sprite.destroy(true);
+    this.nameLabel.destroy(true);
   }
 }

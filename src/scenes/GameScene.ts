@@ -8,7 +8,12 @@ export default class GameScene extends Phaser.Scene {
   private static readonly FULLSCREEN_KEY = "fullscreen";
 
   private uid: string;
+
+  private targetX!: number;
+  private targetDirection!: number;
   private mummy: Mummy
+
+  private opponentMummies: Map<string, Mummy>;
   private backButton!: Phaser.GameObjects.Image;
   private fullscreenButton!: Phaser.GameObjects.Image;
   private backCallback: () => void;
@@ -18,8 +23,9 @@ export default class GameScene extends Phaser.Scene {
   constructor(uid: string, name: string, backCallback: () => void) {
     super("game1");
     this.uid = uid;
-    this.mummy = new Mummy(this, name);
     this.backCallback = backCallback;
+    this.mummy = new Mummy(this, name);
+    this.opponentMummies = new Map<string, Mummy>();
     this.fbGameService = new FirebaseGameService(uid, name);
   }
 
@@ -32,12 +38,15 @@ export default class GameScene extends Phaser.Scene {
   create(): void {
     this.cameras.main.setBackgroundColor("#333333");
 
-    this.mummy.create(10, 160);
+    const startY = 50 + Math.round(Math.random() * 250);
+    this.mummy.create(10, startY);
+    this.targetX = 10;
+    this.targetDirection = 1;
 
     this.mummy.sprite
       .setInteractive()
       .on("pointerup", () => {
-        this.mummy.turn();
+        this.turn();
       }, this);
 
     this.backButton = this.add.image(16, 16, GameScene.BACK_KEY)
@@ -64,16 +73,47 @@ export default class GameScene extends Phaser.Scene {
     }, this);
 
     this.fbGameService.createPlayer(this.mummy.sprite.x, this.mummy.sprite.y, this.mummy.isLeftDirection());
+
+    this.fbGameService.onOpponentJoined((opponent) => {
+      const mummy = new Mummy(this, opponent.name);
+      mummy.create(opponent.x, opponent.y);
+      mummy.setDirection(opponent.directionLeft);
+      this.opponentMummies.set(opponent.uid, mummy);
+    }, this);
+
+    this.fbGameService.onOpponentUpdated((opponent) => {
+      const mummy = this.opponentMummies.get(opponent.uid);
+      if (mummy) {
+        mummy.updatePositionX(opponent.x);
+        mummy.setDirection(opponent.directionLeft);
+      }
+    }, this);
+
+    this.fbGameService.onOpponentLeft((opponentUid) => {
+      const mummy = this.opponentMummies.get(opponentUid);
+      if (mummy) {
+        mummy.dispose();
+        this.opponentMummies.delete(opponentUid);
+      }
+    }, this);
+
+    this.fbGameService.onPlayerUpdated((player) => {
+      this.mummy.updatePositionX(player.x);
+      this.mummy.setDirection(player.directionLeft);
+    });
   }
 
   update(time: number, delta: number): void {
-    this.mummy.update(time, delta);
+    if ((this.targetX > this.scale.width && this.targetDirection === 1) || (this.targetX < 0 && this.targetDirection === -1)) {
+      this.turn();
+    } 
 
-    if (this.mummy.sprite.getRightCenter().x > this.scale.width && !this.mummy.isLeftDirection()) {
-      this.mummy.turn();
-    } else if (this.mummy.sprite.getLeftCenter().x < 0 && this.mummy.isLeftDirection()) {
-      this.mummy.turn();
-    }
+    this.targetX = this.targetX + this.targetDirection * Mummy.SPEED * delta;
+    this.fbGameService.updatePlayer(this.targetX, this.targetDirection === -1);
+  }
+
+  private turn() {
+    this.targetDirection *= -1;
   }
 
   private toggleFullscreen(): void {
