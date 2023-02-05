@@ -3,12 +3,13 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAnyqQZf0nBI6tbzDunmAqLJDKose9M1yI",
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
   authDomain: "ionic-react-phaser-multiplayer.firebaseapp.com",
+  databaseURL: "https://ionic-react-phaser-multiplayer-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "ionic-react-phaser-multiplayer",
   storageBucket: "ionic-react-phaser-multiplayer.appspot.com",
   messagingSenderId: "93869890048",
-  appId: "1:93869890048:web:f1b70b47a141592c0c56e5"
+  appId: process.env.REACT_APP_FIREBASE_APP_ID,
 };
 
 const app = initializeApp(firebaseConfig);

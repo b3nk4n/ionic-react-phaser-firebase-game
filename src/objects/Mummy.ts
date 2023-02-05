@@ -1,15 +1,17 @@
 import Phaser from "phaser";
 
+type Direction = -1 | 1;
+
 export default class Mummy {
 
   private static readonly SPRITESHEET = "mummy"
   private static readonly ANIM_WALK = "walk";
   private static readonly SPEED = 0.025;
 
-  private direction = 1;
-  private scene: Phaser.Scene;
-  private name: string;
-
+  private readonly scene: Phaser.Scene;
+  private readonly name: string;
+  
+  private direction: Direction = 1;
   private _sprite!: Phaser.GameObjects.Sprite;
   private nameLabel!: Phaser.GameObjects.Text;
 

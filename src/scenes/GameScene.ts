@@ -1,20 +1,26 @@
 import Phaser from "phaser";
 
 import Mummy from "../objects/Mummy";
+import FirebaseGameService from "../service/firebaseGameService";
 
 export default class GameScene extends Phaser.Scene {
   private static readonly BACK_KEY = "back";
   private static readonly FULLSCREEN_KEY = "fullscreen";
 
+  private uid: string;
   private mummy: Mummy
   private backButton!: Phaser.GameObjects.Image;
   private fullscreenButton!: Phaser.GameObjects.Image;
   private backCallback: () => void;
 
-  constructor(name: string, backCallback: () => void) {
+  private fbGameService: FirebaseGameService;
+
+  constructor(uid: string, name: string, backCallback: () => void) {
     super("game1");
+    this.uid = uid;
     this.mummy = new Mummy(this, name);
     this.backCallback = backCallback;
+    this.fbGameService = new FirebaseGameService(uid, name);
   }
 
   preload(): void {
@@ -56,6 +62,8 @@ export default class GameScene extends Phaser.Scene {
     this.fullscreenButton.on("pointerup", () => {
       this.toggleFullscreen();
     }, this);
+
+    this.fbGameService.createPlayer(this.mummy.sprite.x, this.mummy.sprite.y, this.mummy.isLeftDirection());
   }
 
   update(time: number, delta: number): void {

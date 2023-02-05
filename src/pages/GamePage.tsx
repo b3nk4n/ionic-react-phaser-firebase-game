@@ -3,6 +3,7 @@ import { IonContent, IonPage, useIonViewDidEnter, useIonViewDidLeave, useIonRout
 import GameScene from "../scenes/GameScene";
 import { useParams } from 'react-router';
 import { initGame } from '../game';
+import { useAuth } from '../auth/auth';
 
 interface RouteParams {
   name: string;
@@ -13,10 +14,10 @@ var game: Phaser.Game;
 const GamePage = () => {
   const router = useIonRouter();
   const { name } = useParams<RouteParams>();
-  console.log(name);
+  const { userId } = useAuth();
 
   useIonViewDidEnter(() => {
-    const gameScene = new GameScene(name, () => {
+    const gameScene = new GameScene(userId!, name, () => {
       if (router.canGoBack()) {
         router.goBack();
       }
